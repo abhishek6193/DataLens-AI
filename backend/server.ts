@@ -1,13 +1,18 @@
 import express from "express";
 import cors from "cors";
 import { readCSV } from "./src/utils/loadCSV";
-import { calculateChurnRate, calculateTotalRevenue, calculateTotalSubscriptions } from "./src/utils/metrics";
+import metricsRoute from "./src/routes/metrics";
+import subscriptionsRoute from "./src/routes/subscriptions";
+import performancesRoute from "./src/routes/performances";
+import engagementsRoute from "./src/routes/engagements";
+
 
 const app = express();
 app.use(cors());
 
 const PORT: number = 6193;
 
+// route to understand the health of the app
 app.get("/health", (req, res) => {
     res.json({
         status: "OK",
@@ -16,37 +21,16 @@ app.get("/health", (req, res) => {
     });
 });
 
-// route to get subscriptions
-app.get("/api/subscriptions", async (req, res) => {
-    const subs: Array<object> = await readCSV("../data/subscriptions.csv");
-    res.json(subs);
-});
+// subscriptions routes
+app.use("/api/subscriptions", subscriptionsRoute);
 
-// route to get engagements
-app.get("/api/engagements", async (req, res) => {
-    const engagements: Array<object> = await readCSV("../data/engagement.csv");
-    res.json(engagements);
-});
+// engagements routes
+app.use("/api/engagements", engagementsRoute);
 
-// route to get performances
-app.get("/api/performances", async (req, res) => {
-    const performances: Array<object> = await readCSV("../data/performance.csv");
-    res.json(performances);
-});
+// performances routes
+app.use("/api/performances", performancesRoute);
 
-// route to get metrics
-app.get("/api/metrics", async (req, res) => {
-    const subs: Array<object> = await readCSV("../data/subscriptions.csv");
-
-    const totalRevenue = calculateTotalRevenue(subs);
-    const churnRate = calculateChurnRate(subs);
-    const totalSubscriptions = calculateTotalSubscriptions(subs);
-
-    res.json({
-        totalRevenue,
-        churnRate,
-        totalSubscriptions
-    })
-})
+// metrics routes
+app.use("/api/metrics", metricsRoute);
 
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
