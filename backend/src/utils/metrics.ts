@@ -16,7 +16,7 @@ export function calculateChurnRate(data: Array<object>) {
     return Number((totalChurn / totalSubs) * 100).toFixed(2);
 }
 
-// calculate total susbscriptions
+// calculate total subscriptions
 export function calculateTotalSubscriptions(data: Array<object>) {
     return data.reduce((sum: number, row: any) => sum = sum + row.activeSubscribers, 0);
 }
