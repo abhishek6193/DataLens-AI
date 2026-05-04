@@ -20,3 +20,24 @@ export function calculateChurnRate(data: Array<object>) {
 export function calculateTotalSubscriptions(data: Array<object>) {
     return data.reduce((sum: number, row: any) => sum = sum + row.activeSubscribers, 0);
 }
+
+// aggregate revenue by month
+export function calculateMonthlyRevenue(data: Array<object>) {
+    const monthlyRevenue: Record<string, number> = {};
+
+    data.forEach((row: any) => {
+        const month = row.month;
+        if(!monthlyRevenue[month]) {
+            monthlyRevenue[month] = 0;
+        }
+        monthlyRevenue[month] = monthlyRevenue[month] + row.revenue;
+    });
+
+    // converting object to array for easier handling in frontend
+    return Object.entries(monthlyRevenue).map(([month, revenue]) => {
+        return {
+            month,
+            revenue
+        }
+    });
+}
