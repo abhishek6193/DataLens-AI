@@ -41,3 +41,24 @@ export function calculateMonthlyRevenue(data: Array<object>) {
         }
     });
 }
+
+// calculate month over month growth
+export function calculateMoMGrowth(data: { month: string, revenue: number }[]) {
+    const growth = []; // array to return mom growth for each month
+
+   for(let i=1; i < data.length; i++) {
+        const prevMonthRevenue: any = data[i-1]?.revenue;
+        const currentMonthRevenue: any = data[i]?.revenue;
+        let change;
+        if(!prevMonthRevenue) change = 0;
+        else {
+            change = ((currentMonthRevenue - prevMonthRevenue) / prevMonthRevenue) * 100; // formula for MoM growth
+        }
+        growth.push({
+            month: data[i]?.month,
+            growth: Number(change.toFixed(2)),
+        })
+   }
+
+   return growth;
+}

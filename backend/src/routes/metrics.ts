@@ -4,6 +4,7 @@ import express from "express";
 import { readCSV } from "../utils/loadCSV";
 import {
   calculateChurnRate,
+  calculateMoMGrowth,
   calculateMonthlyRevenue,
   calculateTotalRevenue,
   calculateTotalSubscriptions,
@@ -20,13 +21,15 @@ router.get("/", async (req, res) => { // default route to return main metrics
     const churnRate = calculateChurnRate(subs); // get churn rate metric
     const totalSubscriptions = calculateTotalSubscriptions(subs); // get total subscriptions metric
     const monthlyRevenue = calculateMonthlyRevenue(subs); // get revenue grouped by month
+    const monthOverMonthGrowth = calculateMoMGrowth(monthlyRevenue); // get month over month growth trend from aggregated monthly revenue
 
     // return metrics in a json response
     res.json({
       totalRevenue,
       churnRate,
       totalSubscriptions,
-      monthlyRevenue
+      monthlyRevenue,
+      monthOverMonthGrowth
     });
   } catch (error) {
     console.error(`Error fetching metrics data: ${error}`);
