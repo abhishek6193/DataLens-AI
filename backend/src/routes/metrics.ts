@@ -13,7 +13,8 @@ import {
 const router = express.Router(); // express's router instance
 
 /* Register metrics routes */
-router.get("/", async (req, res) => { // default route to return main metrics
+router.get("/", async (req, res) => {
+  // default route to return main metrics
   try {
     const subs: Array<object> = await readCSV("../data/subscriptions.csv"); // get subscriptions data
 
@@ -25,11 +26,9 @@ router.get("/", async (req, res) => { // default route to return main metrics
 
     // return metrics in a json response
     res.json({
-      totalRevenue,
-      churnRate,
-      totalSubscriptions,
-      monthlyRevenue,
-      monthOverMonthGrowth
+      summary: { totalRevenue, churnRate, totalSubscriptions },
+      trends: { monthlyRevenue, monthOverMonthGrowth },
+      meta: { generatedAt: new Date() },
     });
   } catch (error) {
     console.error(`Error fetching metrics data: ${error}`);
