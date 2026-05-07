@@ -62,3 +62,33 @@ export function calculateMoMGrowth(data: { month: string, revenue: number }[]) {
 
    return growth;
 }
+
+// format engagement metrics
+export function formatEngagementMetrics(data: any[]) {
+    return {
+        monthlyActiveUsers: data.map((row) => {
+            return {
+                month: row.month,
+                MAU: row.MAU
+            }
+        }),
+        dailyActiveUsers: data.map((row) => {
+            return {
+                month: row.month,
+                DAU: row.DAU
+            }
+        }),
+        completionRates: data.map((row) => {
+            return {
+                month: row.month,
+                completionRate: row.completionRate
+            }
+        }),
+        watchHours: data.map((row) => {
+            return {
+                month: row.month,
+                totalWatchHours: row.totalWatchHours
+            }
+        }),
+    }
+}
