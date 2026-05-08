@@ -9,6 +9,7 @@ import {
   calculateTotalRevenue,
   calculateTotalSubscriptions,
   formatEngagementMetrics,
+  formatPerformanceMetrics,
 } from "../utils/metrics";
 
 const router = express.Router(); // express's router instance
@@ -19,6 +20,7 @@ router.get("/", async (req, res) => {
   try {
     const subs: Array<object> = await readCSV("../data/subscriptions.csv"); // get subscriptions data
     const engagementData: Array<object> = await readCSV("../data/engagement.csv"); // get engagements data
+    const performanceData: Array<object> = await readCSV("../data/performance.csv"); // get performance data
 
     const totalRevenue = calculateTotalRevenue(subs); // get total revenue metric
     const churnRate = calculateChurnRate(subs); // get churn rate metric
@@ -26,12 +28,14 @@ router.get("/", async (req, res) => {
     const monthlyRevenue = calculateMonthlyRevenue(subs); // get revenue grouped by month
     const monthOverMonthGrowth = calculateMoMGrowth(monthlyRevenue); // get month over month growth trend from aggregated monthly revenue
     const engagementMetrics = formatEngagementMetrics(engagementData); // format engagement metrics monthly
+    const performanceMetrics = formatPerformanceMetrics(performanceData); // format performance metrics monthly
 
     // return metrics in a json response
     res.json({
       summary: { totalRevenue, churnRate, totalSubscriptions },
       trends: { monthlyRevenue, monthOverMonthGrowth },
       engagementMetrics,
+      performanceMetrics,
       meta: { generatedAt: new Date() },
     });
   } catch (error) {
