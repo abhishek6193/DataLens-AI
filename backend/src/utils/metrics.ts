@@ -97,6 +97,7 @@ export function formatEngagementMetrics(data: any[]) {
   };
 }
 
+// format performance metrics
 export function formatPerformanceMetrics(data: any[]) {
   return {
     latency: data.map((row) => {
@@ -123,6 +124,25 @@ export function formatPerformanceMetrics(data: any[]) {
         apiRequestVolume: row.apiRequestVolume,
       };
     }),
-    highErrorMonths: data.filter((row) => row.errorRatePercent > 1.7),
   };
+}
+
+// generate churn insights from buffering data
+export function generateBufferingChurnInsights(
+  subscriptionsData: any[],
+  performanceData: any[]
+) {
+  return subscriptionsData.map((subscription) => {
+    const month = subscription.month;
+    const performance = performanceData.find(
+      (performanceRow) => performanceRow.month === month
+    );
+
+    return {
+      month,
+      cancellations: subscription.cancellations,
+      bufferingRatePercent: performance.bufferingRatePercent ?? null,
+      isHighRisk: performance.bufferingRatePercent > 4,
+    };
+  });
 }
