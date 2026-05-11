@@ -12,6 +12,7 @@ import {
   formatPerformanceMetrics,
   generateBufferingChurnInsights,
 } from "../utils/metrics";
+import { EngagementRow, MetricsResponse, PerformanceRow, SubscriptionRow } from "../types";
 
 const router = express.Router(); // express's router instance
 
@@ -21,21 +22,31 @@ const router = express.Router(); // express's router instance
 router.get("/", async (req, res) => {
   try {
     // extract filters from query params
-    const month = req.query.month as string |  undefined;
-    const section = req.query.section as string | undefined;
-  
-    const subs: Array<object> = await readCSV("../data/subscriptions.csv"); // get subscriptions data
-    const engagementData: Array<object> = await readCSV(
+    const month = req.query.month as string | undefined;
+    const section = req.query.section as keyof MetricsResponse | undefined;
+
+    const subs: SubscriptionRow[] = await readCSV("../data/subscriptions.csv"); // get subscriptions data
+    const engagementData: EngagementRow[] = await readCSV(
       "../data/engagement.csv"
     ); // get engagements data
-    const performanceData: Array<object> = await readCSV(
+    const performanceData: PerformanceRow[] = await readCSV(
       "../data/performance.csv"
     ); // get performance data
 
     // filter data based on the filter month
-    const filteredSubs = month ? subs.filter((sub: any) => sub.month === month) : subs;
-    const filteredEngagements = month ? engagementData.filter((engagement: any) => engagement.month === month) : engagementData;
-    const filteredPerformance = month ? performanceData.filter((performance: any) => performance.month === month) : performanceData;
+    const filteredSubs = month
+      ? subs.filter((sub: SubscriptionRow) => sub.month === month)
+      : subs;
+    const filteredEngagements = month
+      ? engagementData.filter(
+          (engagement: EngagementRow) => engagement.month === month
+        )
+      : engagementData;
+    const filteredPerformance = month
+      ? performanceData.filter(
+          (performance: PerformanceRow) => performance.month === month
+        )
+      : performanceData;
 
     const totalRevenue = calculateTotalRevenue(filteredSubs); // get total revenue metric
     const churnRate = calculateChurnRate(filteredSubs); // get churn rate metric
@@ -50,7 +61,7 @@ router.get("/", async (req, res) => {
     ); // get churn insights from buffering data
 
     // prepare metrics as json response
-    let resJson: any = {
+    let resJson: MetricsResponse | MetricsResponse[keyof MetricsResponse] = {
       summary: { totalRevenue, churnRate, totalSubscriptions },
       trends: { monthlyRevenue, monthOverMonthGrowth },
       engagement: engagementMetrics,
@@ -58,14 +69,17 @@ router.get("/", async (req, res) => {
       insights: { bufferingVsChurn: bufferingChurnInsights },
       alerts: {
         highErrorMonths: filteredPerformance.filter(
-          (performanceRow: any) => performanceRow.errorRatePercent > 1.7
+          (performanceRow: PerformanceRow) =>
+            performanceRow.errorRatePercent > 1.7
         ),
       },
       meta: { generatedAt: new Date() },
     };
 
     // filter by the section value in query param
-    resJson = section ? resJson[section] ?? { error: "Invalid section" } : resJson;
+    resJson = section
+      ? resJson[section] ?? { error: "Invalid section" }
+      : resJson;
 
     res.json(resJson);
   } catch (error) {

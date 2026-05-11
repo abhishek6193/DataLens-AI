@@ -1,14 +1,19 @@
+import { EngagementRow, PerformanceRow, SubscriptionRow } from "../types";
+
 // calculate total revenue
-export function calculateTotalRevenue(data: Array<object>) {
-  return data.reduce((sum: number, row: any) => (sum = sum + row.revenue), 0);
+export function calculateTotalRevenue(data: SubscriptionRow[]) {
+  return data.reduce(
+    (sum: number, row: SubscriptionRow) => (sum = sum + row.revenue),
+    0
+  );
 }
 
 // calculate churn rate
-export function calculateChurnRate(data: Array<object>) {
+export function calculateChurnRate(data: SubscriptionRow[]) {
   let totalChurn = 0;
   let totalSubs = 0;
 
-  data.forEach((row: any) => {
+  data.forEach((row: SubscriptionRow) => {
     totalChurn = totalChurn + row.cancellations;
     totalSubs = totalSubs + row.activeSubscribers;
   });
@@ -17,18 +22,18 @@ export function calculateChurnRate(data: Array<object>) {
 }
 
 // calculate total subscriptions
-export function calculateTotalSubscriptions(data: Array<object>) {
+export function calculateTotalSubscriptions(data: SubscriptionRow[]) {
   return data.reduce(
-    (sum: number, row: any) => (sum = sum + row.activeSubscribers),
+    (sum: number, row: SubscriptionRow) => (sum = sum + row.activeSubscribers),
     0
   );
 }
 
 // aggregate revenue by month
-export function calculateMonthlyRevenue(data: Array<object>) {
+export function calculateMonthlyRevenue(data: SubscriptionRow[]) {
   const monthlyRevenue: Record<string, number> = {};
 
-  data.forEach((row: any) => {
+  data.forEach((row: SubscriptionRow) => {
     const month = row.month;
     if (!monthlyRevenue[month]) {
       monthlyRevenue[month] = 0;
@@ -50,8 +55,8 @@ export function calculateMoMGrowth(data: { month: string; revenue: number }[]) {
   const growth = []; // array to return mom growth for each month
 
   for (let i = 1; i < data.length; i++) {
-    const prevMonthRevenue: any = data[i - 1]?.revenue;
-    const currentMonthRevenue: any = data[i]?.revenue;
+    const prevMonthRevenue: number | undefined = data[i - 1]?.revenue;
+    const currentMonthRevenue: number = data[i]?.revenue ?? 0;
     let change;
     if (!prevMonthRevenue) change = 0;
     else {
@@ -68,7 +73,7 @@ export function calculateMoMGrowth(data: { month: string; revenue: number }[]) {
 }
 
 // format engagement metrics
-export function formatEngagementMetrics(data: any[]) {
+export function formatEngagementMetrics(data: EngagementRow[]) {
   return {
     monthlyActiveUsers: data.map((row) => {
       return {
@@ -98,7 +103,7 @@ export function formatEngagementMetrics(data: any[]) {
 }
 
 // format performance metrics
-export function formatPerformanceMetrics(data: any[]) {
+export function formatPerformanceMetrics(data: PerformanceRow[]) {
   return {
     latency: data.map((row) => {
       return {
@@ -129,20 +134,22 @@ export function formatPerformanceMetrics(data: any[]) {
 
 // generate churn insights from buffering data
 export function generateBufferingChurnInsights(
-  subscriptionsData: any[],
-  performanceData: any[]
+  subscriptionsData: SubscriptionRow[],
+  performanceData: PerformanceRow[]
 ) {
   return subscriptionsData.map((subscription) => {
     const month = subscription.month;
-    const performance = performanceData.find(
+    const performance: PerformanceRow | undefined = performanceData.find(
       (performanceRow) => performanceRow.month === month
     );
 
     return {
       month,
       cancellations: subscription.cancellations,
-      bufferingRatePercent: performance.bufferingRatePercent ?? null,
-      isHighRisk: performance.bufferingRatePercent > 4,
+      bufferingRatePercent: performance?.bufferingRatePercent ?? null,
+      isHighRisk: performance?.bufferingRatePercent
+        ? performance.bufferingRatePercent > 4
+        : false,
     };
   });
 }
