@@ -83,3 +83,8 @@ export interface MetricsResponse {
   };
   meta: { generatedAt: Date };
 }
+
+export interface MetricsFilters {
+  month?: string | undefined;
+  section?: keyof MetricsResponse | undefined;
+}
