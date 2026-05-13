@@ -74,10 +74,12 @@ export async function getMetrics(filters: MetricsFilters) {
     meta: { generatedAt: new Date() },
   };
 
+  if (section && !(section in resJson)) {
+    throw new Error("Invalid section");
+  }
+
   // filter by the section value in query param
-  resJson = section
-    ? resJson[section] ?? { error: "Invalid section" }
-    : resJson;
+  resJson = section ? resJson[section] : resJson;
 
   return resJson;
 }
