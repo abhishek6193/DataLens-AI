@@ -18,6 +18,7 @@ import {
   MetricsResponse,
   MetricsFilters,
 } from "../types";
+import { filterByMonth } from "../utils/filter";
 
 // service to get metrics based on filters provided
 export async function getMetrics(filters: MetricsFilters) {
@@ -32,18 +33,12 @@ export async function getMetrics(filters: MetricsFilters) {
   ); // get performance data
 
   // filter data based on the filter month
-  const filteredSubs = month
-    ? subs.filter((sub: SubscriptionRow) => sub.month === month)
-    : subs;
+  const filteredSubs = month ? filterByMonth(subs, month) : subs;
   const filteredEngagements = month
-    ? engagementData.filter(
-        (engagement: EngagementRow) => engagement.month === month
-      )
+    ? filterByMonth(engagementData, month)
     : engagementData;
   const filteredPerformance = month
-    ? performanceData.filter(
-        (performance: PerformanceRow) => performance.month === month
-      )
+    ? filterByMonth(performanceData, month)
     : performanceData;
 
   const totalRevenue = calculateTotalRevenue(filteredSubs); // get total revenue metric
