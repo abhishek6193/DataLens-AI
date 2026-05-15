@@ -6,6 +6,7 @@ import metricsRoute from "./src/routes/metrics";
 import subscriptionsRoute from "./src/routes/subscriptions";
 import performancesRoute from "./src/routes/performances";
 import engagementsRoute from "./src/routes/engagements";
+import { logger } from "./src/middleware/logger";
 
 const app = express(); // express instance
 
@@ -14,6 +15,7 @@ const PORT: number = 6193; // define server port number
 
 /* Register middlewares */
 app.use(cors()); // apply cors headers to all incoming requests to this server to prevent cross origin issues
+app.use(logger); // add custom logging middleware to all incoming requests
 
 // register route to understand the health of the app
 app.get("/health", (req, res) => {
