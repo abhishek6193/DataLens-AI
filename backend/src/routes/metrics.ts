@@ -8,7 +8,7 @@ const router = express.Router(); // express's router instance
 /* Register metrics routes */
 
 // default route to return main metrics
-router.get("/", validateMonth, async (req, res) => {
+router.get("/", validateMonth, async (req, res, next) => {
   try {
     // extract filters from query params
     const month = req.query.month as string | undefined;
@@ -18,13 +18,7 @@ router.get("/", validateMonth, async (req, res) => {
 
     res.json(metrics);
   } catch (error) {
-    if (error instanceof Error && error.message === "Invalid section") {
-      return res.status(400).json({
-        error: error.message,
-      });
-    }
-    console.error(`Error fetching metrics data: ${error}`);
-    res.status(500).json({ error: "Internal Server Error" });
+    next(error);  // delegate to centralized error handler middleware
   }
 });
 

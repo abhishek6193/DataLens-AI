@@ -6,7 +6,10 @@ import metricsRoute from "./src/routes/metrics";
 import subscriptionsRoute from "./src/routes/subscriptions";
 import performancesRoute from "./src/routes/performances";
 import engagementsRoute from "./src/routes/engagements";
+
+// import custom middlewares
 import { logger } from "./src/middleware/logger";
+import { errorHandler } from "./src/middleware/errorHandler";
 
 const app = express(); // express instance
 
@@ -31,6 +34,9 @@ app.use("/api/subscriptions", subscriptionsRoute); // handle all subscriptions r
 app.use("/api/engagements", engagementsRoute); // handle all engagements routes
 app.use("/api/performances", performancesRoute); // handle all performances routes
 app.use("/api/metrics", metricsRoute); // handle all metrics routes
+
+// register error handler middleware
+app.use(errorHandler);
 
 // setup is complete, start the server on the preferred port, listen to all the incoming requests
 app.listen(PORT, (err) => {

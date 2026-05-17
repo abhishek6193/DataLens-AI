@@ -10,7 +10,10 @@ import {
   formatPerformanceMetrics,
   generateBufferingChurnInsights,
 } from "../utils/metrics";
+import { filterByMonth } from "../utils/filter";
+import { AppError } from "../utils/appError";
 
+// import types
 import {
   EngagementRow,
   PerformanceRow,
@@ -18,7 +21,6 @@ import {
   MetricsResponse,
   MetricsFilters,
 } from "../types";
-import { filterByMonth } from "../utils/filter";
 
 // service to get metrics based on filters provided
 export async function getMetrics(filters: MetricsFilters) {
@@ -70,7 +72,7 @@ export async function getMetrics(filters: MetricsFilters) {
   };
 
   if (section && !(section in resJson)) {
-    throw new Error("Invalid section");
+    throw new AppError("Invalid section", 400);
   }
 
   // filter by the section value in query param
