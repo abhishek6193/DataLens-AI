@@ -1,6 +1,10 @@
 import express from "express";
 import cors from "cors";
 
+// load env config
+import dotenv from "dotenv";
+dotenv.config();
+
 // import routes
 import metricsRoute from "./src/routes/metrics";
 import subscriptionsRoute from "./src/routes/subscriptions";
@@ -11,10 +15,13 @@ import engagementsRoute from "./src/routes/engagements";
 import { logger } from "./src/middleware/logger";
 import { errorHandler } from "./src/middleware/errorHandler";
 
+// import config object
+import { config } from "./src/config";
+
 const app = express(); // express instance
 
 /* Setup server config */
-const PORT: number = 6193; // define server port number
+const PORT: number = Number(config.port) || 6193; // define server port number
 
 /* Register middlewares */
 app.use(cors()); // apply cors headers to all incoming requests to this server to prevent cross origin issues
