@@ -1,8 +1,13 @@
 import express from "express";
+
 import { MetricsResponse } from "../types";
+
 import { getMetrics } from "../services/metricsService";
+
 import { validateMonth } from "../middleware/validateMonth";
+
 import { asyncHandler } from "../utils/asyncHandler";
+import { successResponse } from "../utils/apiResponse";
 
 const router = express.Router(); // express's router instance
 
@@ -19,7 +24,7 @@ router.get(
 
     const metrics = await getMetrics({ month, section });
 
-    res.json(metrics);
+    res.json(successResponse(metrics));
   })
 );
 

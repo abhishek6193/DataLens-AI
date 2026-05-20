@@ -3,6 +3,7 @@ import express from "express";
 // import utilities
 import { readCSV } from "../utils/loadCSV";
 import { asyncHandler } from "../utils/asyncHandler";
+import { successResponse } from "../utils/apiResponse";
 
 import { PerformanceRow } from "../types";
 
@@ -18,7 +19,7 @@ router.get(
     ); // get performances data
 
     // return performances in json response
-    res.json(performances);
+    res.json(successResponse(performances));
   })
 );
 

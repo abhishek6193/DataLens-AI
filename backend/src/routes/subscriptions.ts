@@ -3,6 +3,7 @@ import express from "express";
 // import utilities
 import { readCSV } from "../utils/loadCSV";
 import { asyncHandler } from "../utils/asyncHandler";
+import { successResponse } from "../utils/apiResponse";
 
 import { SubscriptionRow } from "../types";
 
@@ -15,7 +16,7 @@ router.get(
     const subs: SubscriptionRow[] = await readCSV("../data/subscriptions.csv"); // get subscriptions data
 
     // return subscriptions in json response
-    res.json(subs);
+    res.json(successResponse(subs));
   })
 );
 

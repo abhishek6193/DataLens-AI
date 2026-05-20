@@ -3,6 +3,7 @@ import express from "express";
 // import utilities
 import { readCSV } from "../utils/loadCSV";
 import { asyncHandler } from "../utils/asyncHandler";
+import { successResponse } from "../utils/apiResponse";
 
 import { EngagementRow } from "../types";
 
@@ -19,7 +20,7 @@ router.get(
     ); // get engagenments data
 
     // return engagements in json response
-    res.json(engagements);
+    res.json(successResponse(engagements));
   })
 );
 
