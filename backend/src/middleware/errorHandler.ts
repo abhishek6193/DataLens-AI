@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { AppError } from "../utils/appError";
 import { errorResponse } from "../utils/apiResponse";
+import { logError } from "../utils/logger";
 
 // middleware to centralize error handling logic
 export function errorHandler(
@@ -9,7 +10,9 @@ export function errorHandler(
   res: Response,
   next: NextFunction
 ) {
-  console.error(err);
+  logError("Unhandled application error", {
+    error: err instanceof Error ? err.message : "Unknown error",
+  });
 
   const statusCode = err instanceof AppError ? err.statusCode : 500;
 

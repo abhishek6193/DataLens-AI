@@ -18,6 +18,9 @@ import { errorHandler } from "./src/middleware/errorHandler";
 // import config object
 import { config } from "./src/config";
 
+// import utilities
+import { logError, logInfo } from "./src/utils/logger";
+
 const app = express(); // express instance
 
 /* Setup server config */
@@ -29,11 +32,11 @@ app.use(logger); // add custom logging middleware to all incoming requests
 
 // register route to understand the health of the app
 app.get("/health", (req, res) => {
-    res.json({
-        status: "OK",
-        message: "Server is running",
-        date: new Date()
-    });
+  res.json({
+    status: "OK",
+    message: "Server is running",
+    date: new Date(),
+  });
 });
 
 /* Register application routes */
@@ -47,9 +50,14 @@ app.use(errorHandler);
 
 // setup is complete, start the server on the preferred port, listen to all the incoming requests
 app.listen(PORT, (err) => {
-    if (err) { // basic error handling for server startup
-        console.error(`Error starting server: ${err}`);
-    } else {
-        console.log(`Server is running on port ${PORT}`);
-    }
+  if (err) {
+    // basic error handling for server startup
+    logError("Unhandled application error", {
+      error: err instanceof Error ? err.message : "Unknown error",
+    });
+  } else {
+    logInfo("Server is running", {
+      port: PORT,
+    });
+  }
 });

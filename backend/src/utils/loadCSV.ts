@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import Papa, { ParseResult } from "papaparse";
+import { logError } from "./logger";
 
 // Read a CSV file and return its contents as an array of objects
 export async function readCSV<T>(filePath: string): Promise<T[]> {
@@ -17,7 +18,10 @@ export async function readCSV<T>(filePath: string): Promise<T[]> {
       });
     });
   } catch (error) {
-    console.error(`Error reading CSV file at ${filePath}: ${error}`);
+    logError("Error reading CSV file", {
+      error,
+      filePath,
+    });
     throw error;
   }
 }
