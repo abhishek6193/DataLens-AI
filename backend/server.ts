@@ -1,6 +1,9 @@
 import express from "express";
 import cors from "cors";
 
+//load database
+import "./src/db/init";
+
 // load env config
 import dotenv from "dotenv";
 dotenv.config();
