@@ -1,19 +1,6 @@
 import { db } from "./database";
-import { query } from "./query";
-
-import { logError, logInfo } from "../utils/logger";
-
-//testing query wrapper
-async function testQuery() {
-  const rows = await query("SELECT * FROM subscriptions WHERE month = ?", [
-    "2022-02",
-  ]);
-  console.log(rows);
-}
-async function queryOne(id: number) {
-  const rows = await query("SELECT * FROM subscriptions WHERE id = ?", [id]);
-  console.log(rows);
-}
+import { getSubscriptions, getSubscriptionsByMonth } from "../repositories/subscriptionRepository";
+import { logInfo } from "../utils/logger";
 
 // init db
 db.serialize(() => {
@@ -24,7 +11,11 @@ db.serialize(() => {
         revenue INTEGER,
         activeSubscribers INTEGER
     )`);
-  queryOne(4);
+
+  // testing repository layer
+  (async () => logInfo("Read all subscriptions", await getSubscriptions()))();
+  (async () => logInfo("Read subscriptions by month", await getSubscriptionsByMonth("2022-02")))();
+
   // db.run(`
   //   INSERT INTO subscriptions
   //   (month, revenue, activeSubscribers)
