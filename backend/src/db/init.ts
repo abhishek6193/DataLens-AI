@@ -1,52 +1,55 @@
 import { db } from "./database";
-import { getSubscriptions, getSubscriptionsByMonth } from "../repositories/subscriptionRepository";
+
+import {
+  getSubscriptions,
+  getSubscriptionsByMonth,
+} from "../repositories/subscriptionRepository";
+import { run } from "./seed";
+
+import { SubscriptionRow } from "../types";
+
 import { logInfo } from "../utils/logger";
+import { readCSV } from "../utils/loadCSV";
 
 // init db
 db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS subscriptions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        month TEXT,
+        month TEXT UNIQUE,
+        newSubscriptions INTEGER,
+        cancellations INTEGER,
+        activeSubscribers INTEGER,
         revenue INTEGER,
-        activeSubscribers INTEGER
+        arpu INTEGER
     )`);
 
-  // testing repository layer
-  (async () => logInfo("Read all subscriptions", await getSubscriptions()))();
-  (async () => logInfo("Read subscriptions by month", await getSubscriptionsByMonth("2022-02")))();
+  (async () => {
+    const subscriptions: SubscriptionRow[] = await readCSV(
+      "../data/subscriptions.csv"
+    );
 
-  // db.run(`
-  //   INSERT INTO subscriptions
-  //   (month, revenue, activeSubscribers)
-  //   VALUES
-  //   ('2022-02', 2380000, 34000)
-  //   `);
-  // db.all("SELECT * from subscriptions", [], (err, rows) => {
-  //   if (err) {
-  //     logError("Error reading subscriptions from database", {
-  //       err,
-  //     });
-  //   } else {
-  //     logInfo("Read subscriptions from database", rows);
-  //   }
-  // });
-  // db.all("SELECT * from subscriptions where month = ?", ["2022-02"], (err, rows) => {
-  //   if (err) {
-  //     logError("Error reading filtered subscriptions from database", {
-  //       err,
-  //     });
-  //   } else {
-  //     logInfo("Read filtered subscriptions from database", rows);
-  //   }
-  // });
-  // db.all("SELECT * from subscriptions ORDER BY revenue DESC", [], (err, rows) => {
-  //   if (err) {
-  //     logError("Error reading sorted subscriptions from database", {
-  //       err,
-  //     });
-  //   } else {
-  //     logInfo("Read sorted subscriptions from database", rows);
-  //   }
-  // });
+    // testing seed wrapper
+    for (const row of subscriptions) {
+      await run(
+        `INSERT OR IGNORE INTO subscriptions 
+         (month, newSubscriptions, cancellations, activeSubscribers, revenue, arpu)
+         values(?, ?, ?, ?, ?, ?)`,
+        [
+          row.month,
+          row.newSubscriptions,
+          row.cancellations,
+          row.activeSubscribers,
+          row.revenue,
+          row.arpu,
+        ]
+      );
+    }
+
+    // testing repository layer
+    const allSubscriptions = await getSubscriptions();
+    const subscriptionsByMonth = await getSubscriptionsByMonth("2022-02");
+    logInfo("Read all subscriptions", allSubscriptions);
+    logInfo("Read subscriptions by month", subscriptionsByMonth);
+  })();
 });
