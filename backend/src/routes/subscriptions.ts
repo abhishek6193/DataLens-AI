@@ -8,6 +8,8 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { successResponse } from "../utils/apiResponse";
 import { logInfo } from "../utils/logger";
 
+import { getSubscriptions } from "../repositories/subscriptionRepository";
+
 const router = express.Router(); // express's router instance
 
 router.get(
@@ -17,7 +19,7 @@ router.get(
 
     logInfo("Fetching subscriptions");
 
-    const subs: SubscriptionRow[] = await readCSV("../data/subscriptions.csv"); // get subscriptions data
+    const subs = await getSubscriptions();
 
     // return subscriptions in json response
     res.json(successResponse(subs));

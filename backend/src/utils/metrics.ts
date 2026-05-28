@@ -1,53 +1,65 @@
+import {
+  getTotalRevenue,
+  getTotalChurn,
+  getTotalActiveSubscribers,
+  getMonthlyRevenue,
+} from "../repositories/analyticsRepository";
 import { EngagementRow, PerformanceRow, SubscriptionRow } from "../types";
 
 // calculate total revenue
-export function calculateTotalRevenue(data: SubscriptionRow[]) {
-  return data.reduce(
-    (sum: number, row: SubscriptionRow) => (sum = sum + row.revenue),
-    0
-  );
+export async function calculateTotalRevenue(data: SubscriptionRow[]) {
+  // return data.reduce(
+  //   (sum: number, row: SubscriptionRow) => (sum = sum + row.revenue),
+  //   0
+  // );
+  return await getTotalRevenue();
 }
 
 // calculate churn rate
-export function calculateChurnRate(data: SubscriptionRow[]) {
-  let totalChurn = 0;
-  let totalSubs = 0;
+export async function calculateChurnRate(data: SubscriptionRow[]) {
+  // let totalChurn = 0;
+  // let totalSubs = 0;
 
-  data.forEach((row: SubscriptionRow) => {
-    totalChurn = totalChurn + row.cancellations;
-    totalSubs = totalSubs + row.activeSubscribers;
-  });
+  // data.forEach((row: SubscriptionRow) => {
+  //   totalChurn = totalChurn + row.cancellations;
+  //   totalSubs = totalSubs + row.activeSubscribers;
+  // });
+
+  const totalChurn = await getTotalChurn();
+  const totalSubs = await getTotalActiveSubscribers();
 
   return Number((totalChurn / totalSubs) * 100).toFixed(2);
 }
 
 // calculate total subscriptions
-export function calculateTotalSubscriptions(data: SubscriptionRow[]) {
-  return data.reduce(
-    (sum: number, row: SubscriptionRow) => (sum = sum + row.activeSubscribers),
-    0
-  );
+export async function calculateTotalSubscriptions(data: SubscriptionRow[]) {
+  // return data.reduce(
+  //   (sum: number, row: SubscriptionRow) => (sum = sum + row.activeSubscribers),
+  //   0
+  // );
+  return await getTotalActiveSubscribers();
 }
 
 // aggregate revenue by month
-export function calculateMonthlyRevenue(data: SubscriptionRow[]) {
-  const monthlyRevenue: Record<string, number> = {};
+export async function calculateMonthlyRevenue(data: SubscriptionRow[]) {
+  // const monthlyRevenue: Record<string, number> = {};
 
-  data.forEach((row: SubscriptionRow) => {
-    const month = row.month;
-    if (!monthlyRevenue[month]) {
-      monthlyRevenue[month] = 0;
-    }
-    monthlyRevenue[month] = monthlyRevenue[month] + row.revenue;
-  });
+  // data.forEach((row: SubscriptionRow) => {
+  //   const month = row.month;
+  //   if (!monthlyRevenue[month]) {
+  //     monthlyRevenue[month] = 0;
+  //   }
+  //   monthlyRevenue[month] = monthlyRevenue[month] + row.revenue;
+  // });
 
-  // converting object to array for easier handling in frontend
-  return Object.entries(monthlyRevenue).map(([month, revenue]) => {
-    return {
-      month,
-      revenue,
-    };
-  });
+  // // converting object to array for easier handling in frontend
+  // return Object.entries(monthlyRevenue).map(([month, revenue]) => {
+  //   return {
+  //     month,
+  //     revenue,
+  //   };
+  // });
+  return await getMonthlyRevenue();
 }
 
 // calculate month over month growth

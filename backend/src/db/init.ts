@@ -1,18 +1,11 @@
 import { db } from "./database";
-
-import {
-  getSubscriptions,
-  getSubscriptionsByMonth,
-} from "../repositories/subscriptionRepository";
 import { run } from "./seed";
-
-import { SubscriptionRow } from "../types";
-
-import { logInfo } from "../utils/logger";
+import { EngagementRow, PerformanceRow, SubscriptionRow } from "../types";
 import { readCSV } from "../utils/loadCSV";
 
 // init db
 db.serialize(() => {
+  /* create tables if not exist */
   db.run(`
     CREATE TABLE IF NOT EXISTS subscriptions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -24,6 +17,28 @@ db.serialize(() => {
         arpu INTEGER
     )`);
 
+  db.run(`
+    CREATE TABLE IF NOT EXISTS engagement (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        month TEXT UNIQUE,
+        MAU INTEGER,
+        DAU INTEGER,
+        totalWatchHours INTEGER,
+        avgWatchTimePerUserMinutes INTEGER,
+        completionRate INTEGER
+    )`);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS performance (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        month TEXT UNIQUE,
+        avgLatencyMs INTEGER,
+        errorRatePercent INTEGER,
+        bufferingRatePercent INTEGER,
+        apiRequestVolume INTEGER
+    )`);
+
+  /* seed data from csv files */
   (async () => {
     const subscriptions: SubscriptionRow[] = await readCSV(
       "../data/subscriptions.csv"
@@ -46,10 +61,45 @@ db.serialize(() => {
       );
     }
 
-    // testing repository layer
-    const allSubscriptions = await getSubscriptions();
-    const subscriptionsByMonth = await getSubscriptionsByMonth("2022-02");
-    logInfo("Read all subscriptions", allSubscriptions);
-    logInfo("Read subscriptions by month", subscriptionsByMonth);
+    const engagements: EngagementRow[] = await readCSV(
+      "../data/engagement.csv"
+    );
+
+    // testing seed wrapper
+    for (const row of engagements) {
+      await run(
+        `INSERT OR IGNORE INTO engagement 
+         (month, MAU, DAU, totalWatchHours, avgWatchTimePerUserMinutes, completionRate)
+         values(?, ?, ?, ?, ?, ?)`,
+        [
+          row.month,
+          row.MAU,
+          row.DAU,
+          row.totalWatchHours,
+          row.avgWatchTimePerUserMinutes,
+          row.completionRate,
+        ]
+      );
+    }
+
+    const performances: PerformanceRow[] = await readCSV(
+      "../data/performance.csv"
+    );
+
+    // testing seed wrapper
+    for (const row of performances) {
+      await run(
+        `INSERT OR IGNORE INTO performance 
+         (month, avgLatencyMs, errorRatePercent, bufferingRatePercent, apiRequestVolume)
+         values(?, ?, ?, ?, ?)`,
+        [
+          row.month,
+          row.avgLatencyMs,
+          row.errorRatePercent,
+          row.bufferingRatePercent,
+          row.apiRequestVolume,
+        ]
+      );
+    }
   })();
 });

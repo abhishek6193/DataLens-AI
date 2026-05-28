@@ -7,6 +7,7 @@ import { readCSV } from "../utils/loadCSV";
 import { asyncHandler } from "../utils/asyncHandler";
 import { successResponse } from "../utils/apiResponse";
 import { logInfo } from "../utils/logger";
+import { getPerformances } from "../repositories/performanceRepository";
 
 const router = express.Router(); // express's router instance
 
@@ -18,9 +19,11 @@ router.get(
 
     logInfo("Fetching performance");
 
-    const performances: PerformanceRow[] = await readCSV(
-      "../data/performance.csv"
-    ); // get performances data
+    // const performances: PerformanceRow[] = await readCSV(
+    //   "../data/performance.csv"
+    // ); // get performances data
+
+    const performances = await getPerformances();
 
     // return performances in json response
     res.json(successResponse(performances));

@@ -8,6 +8,8 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { successResponse } from "../utils/apiResponse";
 import { logInfo } from "../utils/logger";
 
+import { getEngagements } from "../repositories/engagementRepository";
+
 const router = express.Router(); // express's router instance
 
 /* Register engagements routes */
@@ -18,9 +20,11 @@ router.get(
 
     logInfo("Fetching engagements");
 
-    const engagements: EngagementRow[] = await readCSV(
-      "../data/engagement.csv"
-    ); // get engagenments data
+    // const engagements: EngagementRow[] = await readCSV(
+    //   "../data/engagement.csv"
+    // ); // get engagenments data
+
+    const engagements = await getEngagements();
 
     // return engagements in json response
     res.json(successResponse(engagements));

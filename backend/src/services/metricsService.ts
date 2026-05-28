@@ -13,6 +13,19 @@ import {
 import { filterByMonth } from "../utils/filter";
 import { AppError } from "../utils/appError";
 
+import {
+  getSubscriptions,
+  getSubscriptionsByMonth,
+} from "../repositories/subscriptionRepository";
+import {
+  getEngagements,
+  getEngagementsByMonth,
+} from "../repositories/engagementRepository";
+import {
+  getPerformances,
+  getPerformancesByMonth,
+} from "../repositories/performanceRepository";
+
 // import types
 import {
   EngagementRow,
@@ -26,27 +39,31 @@ import {
 export async function getMetrics(filters: MetricsFilters) {
   const { month, section } = filters;
 
-  const subs: SubscriptionRow[] = await readCSV("../data/subscriptions.csv"); // get subscriptions data
-  const engagementData: EngagementRow[] = await readCSV(
-    "../data/engagement.csv"
-  ); // get engagements data
-  const performanceData: PerformanceRow[] = await readCSV(
-    "../data/performance.csv"
-  ); // get performance data
+  // const subs: SubscriptionRow[] = await readCSV("../data/subscriptions.csv"); // get subscriptions data
+  // const engagementData: EngagementRow[] = await readCSV(
+  //   "../data/engagement.csv"
+  // ); // get engagements data
+  // const performanceData: PerformanceRow[] = await readCSV(
+  //   "../data/performance.csv"
+  // ); // get performance data
+
+  const subs = await getSubscriptions();
+  const engagementData = await getEngagements();
+  const performanceData = await getPerformances();
 
   // filter data based on the filter month
-  const filteredSubs = month ? filterByMonth(subs, month) : subs;
+  const filteredSubs = month ? await getSubscriptionsByMonth(month) : subs;
   const filteredEngagements = month
-    ? filterByMonth(engagementData, month)
+    ? await getEngagementsByMonth(month)
     : engagementData;
   const filteredPerformance = month
-    ? filterByMonth(performanceData, month)
+    ? await getPerformancesByMonth(month)
     : performanceData;
 
-  const totalRevenue = calculateTotalRevenue(filteredSubs); // get total revenue metric
-  const churnRate = calculateChurnRate(filteredSubs); // get churn rate metric
-  const totalSubscriptions = calculateTotalSubscriptions(filteredSubs); // get total subscriptions metric
-  const monthlyRevenue = calculateMonthlyRevenue(filteredSubs); // get revenue grouped by month
+  const totalRevenue = await calculateTotalRevenue(filteredSubs); // get total revenue metric
+  const churnRate = await calculateChurnRate(filteredSubs); // get churn rate metric
+  const totalSubscriptions = await calculateTotalSubscriptions(filteredSubs); // get total subscriptions metric
+  const monthlyRevenue = await calculateMonthlyRevenue(filteredSubs); // get revenue grouped by month
   const monthOverMonthGrowth = calculateMoMGrowth(monthlyRevenue); // get month over month growth trend from aggregated monthly revenue
   const engagementMetrics = formatEngagementMetrics(filteredEngagements); // format engagement metrics monthly
   const performanceMetrics = formatPerformanceMetrics(filteredPerformance); // format performance metrics monthly
