@@ -38,6 +38,22 @@ db.serialize(() => {
         apiRequestVolume INTEGER
     )`);
 
+  /* create indices if not exist */
+  db.run(`
+    CREATE INDEX IF NOT EXISTS idx_subscriptions_month
+    ON subscriptions (month)
+    `);
+
+  db.run(`
+    CREATE INDEX IF NOT EXISTS idx_engagement_month
+    ON engagement (month)
+    `);
+
+  db.run(`
+    CREATE INDEX IF NOT EXISTS idx_performance_month
+    ON performance (month)
+    `);
+
   /* seed data from csv files */
   (async () => {
     const subscriptions: SubscriptionRow[] = await readCSV(
