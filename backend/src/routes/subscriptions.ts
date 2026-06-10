@@ -9,6 +9,7 @@ import { successResponse } from "../utils/apiResponse";
 import { logInfo } from "../utils/logger";
 
 import { getSubscriptions } from "../repositories/subscriptionRepository";
+import { getPaginatedSubscriptions } from "../services/subscriptionsService";
 
 const router = express.Router(); // express's router instance
 
@@ -19,10 +20,16 @@ router.get(
 
     logInfo("Fetching subscriptions");
 
-    const subs = await getSubscriptions();
+    // extract pagination params from request
+    const page = req.query.page as number | undefined;
+    const pageSize = (req.query.pageSize as number | undefined) || 10; // default page size is 10
+
+    const subs = page
+      ? await getPaginatedSubscriptions(page, pageSize)
+      : await getSubscriptions();
 
     // return subscriptions in json response
-    res.json(successResponse(subs));
+    res.json(successResponse(subs, undefined, page, pageSize));
   })
 );
 

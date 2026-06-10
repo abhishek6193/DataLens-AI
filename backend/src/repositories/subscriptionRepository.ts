@@ -10,5 +10,16 @@ export async function getSubscriptions() {
 
 // query subscriptions by month from database
 export async function getSubscriptionsByMonth(month: string) {
-  return query<SubscriptionRow[]>("SELECT * FROM subscriptions WHERE month = ?", [month]);
+  return query<SubscriptionRow[]>(
+    "SELECT * FROM subscriptions WHERE month = ?",
+    [month]
+  );
+}
+
+// query subscriptions in paginated format
+export async function getSubscriptionsPaginated(limit: number, offset: number) {
+  return query<SubscriptionRow[]>(
+    "SELECT * FROM subscriptions LIMIT ? OFFSET ?",
+    [limit, offset]
+  );
 }

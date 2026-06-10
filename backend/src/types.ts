@@ -88,3 +88,19 @@ export interface MetricsFilters {
   month?: string | undefined;
   section?: keyof MetricsResponse | undefined;
 }
+
+export interface SuccessResponse {
+  success: boolean;
+  data: unknown;
+  message: string;
+  timestamp: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface ErrorResponse {
+  success: boolean;
+  error: unknown;
+  message: string;
+  timestamp: string;
+}

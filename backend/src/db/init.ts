@@ -134,6 +134,6 @@ db.serialize(() => {
     // await run(`INSERT OR IGNORE INTO analytics_reports (month, reportType, generatedAt, subscriptionMonth) values("february", "revenue", "2026-06-05", "2022-02")`);
 
     // test join query fetching reports based on subscription month
-    await getReportsWithSubscriptionData();
+    // await getReportsWithSubscriptionData();
   })();
 });
