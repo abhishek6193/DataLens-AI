@@ -104,3 +104,10 @@ export interface ErrorResponse {
   message: string;
   timestamp: string;
 }
+
+export interface SubscriptionsApiOptions {
+  limit?: number;
+  offset?: number;
+  sortBy?: string;
+  order?: string;
+}
