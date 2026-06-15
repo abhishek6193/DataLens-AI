@@ -16,15 +16,30 @@ router.get(
 
     logInfo("Fetching subscriptions");
 
-    // extract pagination params from request
-    const page = req.query.page as number | undefined;
-    const pageSize = req.query.pageSize as number | undefined;
+    // extract filtering params from request
+    const month = req.query.month as string | undefined;
+    const year = req.query.year as string | undefined;
+    const minRevenue = req.query.minRevenue as number | undefined;
+    const maxRevenue = req.query.maxRevenue as number | undefined;
 
     // extract sorting params from request
     const sortBy = req.query.sortBy as string | undefined;
     const sortOrder = req.query.sortOrder as string | undefined;
 
-    const subs = await getSubscriptionsService(page, pageSize, sortBy, sortOrder);
+    // extract pagination params from request
+    const page = req.query.page as number | undefined;
+    const pageSize = req.query.pageSize as number | undefined;
+
+    const subs = await getSubscriptionsService(
+      page,
+      pageSize,
+      sortBy,
+      sortOrder,
+      month,
+      year,
+      minRevenue,
+      maxRevenue
+    );
 
     // return subscriptions in json response
     res.json(successResponse(subs, undefined, page, pageSize));

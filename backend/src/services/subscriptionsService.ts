@@ -10,7 +10,11 @@ export async function getSubscriptionsService(
   page?: number,
   pageSize: number = 10,
   orderBy?: string,
-  order?: string
+  order?: string,
+  month?: string,
+  year?: string,
+  minRevenue?: number,
+  maxRevenue?: number
 ) {
   const options: SubscriptionsApiOptions = {};
   if (page) {
@@ -34,8 +38,19 @@ export async function getSubscriptionsService(
       throw new Error(`Invalid order: ${order}`);
     }
     options.sortBy = orderBy;
-    console.log("check order", order?.toUpperCase())
     options.order = order?.toUpperCase() ?? "ASC";
+  }
+  if (month) {
+    options.month = month;
+  }
+  if (year) {
+    options.year = year;
+  }
+  if (minRevenue) {
+    options.minRevenue = minRevenue;
+  }
+  if (maxRevenue) {
+    options.maxRevenue = maxRevenue;
   }
 
   return await getSubscriptions(options);

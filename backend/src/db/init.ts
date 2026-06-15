@@ -3,6 +3,7 @@ import { run } from "./seed";
 import { EngagementRow, PerformanceRow, SubscriptionRow } from "../types";
 import { readCSV } from "../utils/loadCSV";
 import { getReportsWithSubscriptionData } from "../repositories/reportsRepository";
+import { query } from "./query";
 
 // init db
 db.serialize(() => {
@@ -135,5 +136,7 @@ db.serialize(() => {
 
     // test join query fetching reports based on subscription month
     // await getReportsWithSubscriptionData();
+
+    //test query
   })();
 });

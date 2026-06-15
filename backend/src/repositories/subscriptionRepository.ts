@@ -4,12 +4,33 @@ import { query } from "../db/query";
 import { SubscriptionRow, SubscriptionsApiOptions } from "../types";
 
 // query all subscriptions from database
-export async function getSubscriptions(
-  options: SubscriptionsApiOptions = {}
-) {
-  const { limit, offset, sortBy, order } = options;
+export async function getSubscriptions(options: SubscriptionsApiOptions = {}) {
+  const { limit, offset, sortBy, order, month, year, minRevenue, maxRevenue } =
+    options;
   let subscriptionQuery = `SELECT * FROM subscriptions`;
   const params = [];
+  if (month) {
+    subscriptionQuery += ` WHERE month = ?`;
+    params.push(month);
+  }
+  if (year) {
+    subscriptionQuery += subscriptionQuery.includes("WHERE")
+      ? ` AND month LIKE ?`
+      : ` WHERE month LIKE ?`;
+    params.push(`${year}%`);
+  }
+  if (minRevenue) {
+    subscriptionQuery += subscriptionQuery.includes("WHERE")
+      ? ` AND revenue >= ?`
+      : ` WHERE revenue >= ?`;
+    params.push(minRevenue);
+  }
+  if (maxRevenue) {
+    subscriptionQuery += subscriptionQuery.includes("WHERE")
+      ? ` AND revenue <= ?`
+      : ` WHERE revenue <= ?`;
+    params.push(maxRevenue);
+  }
   if (sortBy) {
     subscriptionQuery += ` ORDER BY ${sortBy} ${order}`;
   }
@@ -18,6 +39,7 @@ export async function getSubscriptions(
     params.push(limit);
     params.push(offset);
   }
+
   return query<SubscriptionRow[]>(subscriptionQuery, params);
 }
 

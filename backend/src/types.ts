@@ -110,4 +110,8 @@ export interface SubscriptionsApiOptions {
   offset?: number;
   sortBy?: string;
   order?: string;
+  month?: string;
+  year?: string;
+  minRevenue?: number;
+  maxRevenue?: number;
 }
