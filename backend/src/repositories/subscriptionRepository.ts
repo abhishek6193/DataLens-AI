@@ -65,3 +65,36 @@ export async function getSubscriptionsSorted(sortBy: string, order?: string) {
     `SELECT * FROM subscriptions ORDER BY ${sortBy} ${order}`
   );
 }
+
+// query subscriptions count
+export async function getSubscriptionsCount(
+  filters: SubscriptionsApiOptions = {}
+) {
+  const { month, year, minRevenue, maxRevenue } = filters;
+  let subscriptionCountQuery = `SELECT count(*) as subsCount FROM subscriptions`;
+  const params = [];
+  if (month) {
+    subscriptionCountQuery += ` WHERE month = ?`;
+    params.push(month);
+  }
+  if (year) {
+    subscriptionCountQuery += subscriptionCountQuery.includes("WHERE")
+      ? ` AND month LIKE ?`
+      : ` WHERE month LIKE ?`;
+    params.push(`${year}%`);
+  }
+  if (minRevenue) {
+    subscriptionCountQuery += subscriptionCountQuery.includes("WHERE")
+      ? ` AND revenue >= ?`
+      : ` WHERE revenue >= ?`;
+    params.push(minRevenue);
+  }
+  if (maxRevenue) {
+    subscriptionCountQuery += subscriptionCountQuery.includes("WHERE")
+      ? ` AND revenue <= ?`
+      : ` WHERE revenue <= ?`;
+    params.push(maxRevenue);
+  }
+
+  return query<{ subsCount: number }[]>(subscriptionCountQuery, params);
+}

@@ -5,7 +5,10 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { successResponse } from "../utils/apiResponse";
 import { logInfo } from "../utils/logger";
 
-import { getSubscriptionsService } from "../services/subscriptionsService";
+import {
+  getCountSubscriptions,
+  getSubscriptionsService,
+} from "../services/subscriptionsService";
 
 const router = express.Router(); // express's router instance
 
@@ -41,8 +44,28 @@ router.get(
       maxRevenue
     );
 
+    let subsCount: number | undefined;
+
+    if (page) {
+      const queryRes = await getCountSubscriptions(
+        month,
+        year,
+        minRevenue,
+        maxRevenue
+      );
+      subsCount = queryRes.find((res) => res)?.subsCount;
+    }
+
     // return subscriptions in json response
-    res.json(successResponse(subs, undefined, page, pageSize));
+    res.json(
+      successResponse(
+        subs,
+        undefined,
+        Number(page),
+        Number(pageSize),
+        subsCount
+      )
+    );
   })
 );
 

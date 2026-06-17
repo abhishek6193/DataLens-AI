@@ -94,8 +94,16 @@ export interface SuccessResponse {
   data: unknown;
   message: string;
   timestamp: string;
-  page?: number;
-  pageSize?: number;
+  pagination?: {
+    page: number;
+    pageSize: number;
+    totalRecords?: number | undefined;
+    totalPages?: number | null;
+    hasNextPage?: boolean;
+    hasPreviousPage?: boolean;
+    nextPage?: number | null;
+    previousPage?: number | null; 
+  };
 }
 
 export interface ErrorResponse {

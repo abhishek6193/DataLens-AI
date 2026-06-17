@@ -1,5 +1,6 @@
 import {
   getSubscriptions,
+  getSubscriptionsCount,
   getSubscriptionsPaginated,
   getSubscriptionsSorted,
 } from "../repositories/subscriptionRepository";
@@ -83,4 +84,28 @@ export async function getSortedSubscriptions(orderBy: string, order?: string) {
     throw new Error(`Invalid order: ${order}`);
   }
   return await getSubscriptionsSorted(orderBy, order ?? "asc");
+}
+
+//service to get subscriptions count
+export async function getCountSubscriptions(
+  month?: string,
+  year?: string,
+  minRevenue?: number,
+  maxRevenue?: number
+) {
+  const options: SubscriptionsApiOptions = {};
+  if (month) {
+    options.month = month;
+  }
+  if (year) {
+    options.year = year;
+  }
+  if (minRevenue) {
+    options.minRevenue = minRevenue;
+  }
+  if (maxRevenue) {
+    options.maxRevenue = maxRevenue;
+  }
+
+  return await getSubscriptionsCount(options);
 }
