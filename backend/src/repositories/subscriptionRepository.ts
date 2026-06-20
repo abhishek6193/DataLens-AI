@@ -1,6 +1,7 @@
 /* A repository layer to separate data access logic(querying database) from business logic */
 
 import { query } from "../db/query";
+import { run } from "../db/seed";
 import { SubscriptionRow, SubscriptionsApiOptions } from "../types";
 
 // query all subscriptions from database
@@ -97,4 +98,23 @@ export async function getSubscriptionsCount(
   }
 
   return query<{ subsCount: number }[]>(subscriptionCountQuery, params);
+}
+
+//create new subscriptions in database
+export async function createSubscription(newSubscription: SubscriptionRow) {
+  const {
+    month,
+    newSubscriptions,
+    cancellations,
+    activeSubscribers,
+    revenue,
+    arpu,
+  } = newSubscription;
+  return run(
+    `
+    INSERT INTO subscriptions (month, newSubscriptions, cancellations, activeSubscribers, revenue, arpu)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `,
+    [month, newSubscriptions, cancellations, activeSubscribers, revenue, arpu]
+  );
 }

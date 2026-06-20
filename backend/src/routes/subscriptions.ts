@@ -1,4 +1,5 @@
 import express from "express";
+import { json as jsonBodyParser } from "body-parser";
 
 // import utilities
 import { asyncHandler } from "../utils/asyncHandler";
@@ -6,9 +7,12 @@ import { successResponse } from "../utils/apiResponse";
 import { logInfo } from "../utils/logger";
 
 import {
+  addSubscription,
   getCountSubscriptions,
   getSubscriptionsService,
 } from "../services/subscriptionsService";
+import { AppError } from "../utils/appError";
+import { validateSubscription } from "../middleware/validateSubscription";
 
 const router = express.Router(); // express's router instance
 
@@ -66,6 +70,17 @@ router.get(
         subsCount
       )
     );
+  })
+);
+
+router.post(
+  "/",
+  jsonBodyParser(),
+  validateSubscription,
+  asyncHandler(async (req, res, next) => {
+    const newSubscription = req.body;
+    await addSubscription(newSubscription);
+    res.status(201).json(successResponse(newSubscription));
   })
 );
 

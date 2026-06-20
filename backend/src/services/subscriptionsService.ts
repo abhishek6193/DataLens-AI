@@ -1,10 +1,14 @@
 import {
+  createSubscription,
   getSubscriptions,
+  getSubscriptionsByMonth,
   getSubscriptionsCount,
   getSubscriptionsPaginated,
   getSubscriptionsSorted,
 } from "../repositories/subscriptionRepository";
-import { SubscriptionsApiOptions } from "../types";
+import { SubscriptionRow, SubscriptionsApiOptions } from "../types";
+import { AppError } from "../utils/appError";
+import { isValidMonth } from "../utils/validations";
 
 //service to get subscriptions
 export async function getSubscriptionsService(
@@ -108,4 +112,22 @@ export async function getCountSubscriptions(
   }
 
   return await getSubscriptionsCount(options);
+}
+
+//service to get subscriptions by month
+export async function getSubscriptionsByMonthService(month: string) {
+  if (isValidMonth(month)) {
+    return await getSubscriptionsByMonth(month);
+  }
+}
+
+//service to add new subscription
+export async function addSubscription(newSubscription: SubscriptionRow) {
+  const existingSubscription = await getSubscriptionsByMonthService(
+    newSubscription.month
+  );
+
+  if (!existingSubscription || existingSubscription.length > 0)
+    throw new AppError("month already exists", 409);
+  return await createSubscription(newSubscription);
 }
