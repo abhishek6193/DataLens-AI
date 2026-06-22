@@ -118,3 +118,36 @@ export async function createSubscription(newSubscription: SubscriptionRow) {
     [month, newSubscriptions, cancellations, activeSubscribers, revenue, arpu]
   );
 }
+
+//update existing subscriptions in database
+export async function updateSubscription(subscription: SubscriptionRow) {
+  const {
+    month,
+    newSubscriptions,
+    cancellations,
+    activeSubscribers,
+    revenue,
+    arpu,
+  } = subscription;
+  return run(
+    `
+      UPDATE subscriptions SET
+      month = ?,
+      newSubscriptions = ?,
+      cancellations = ?,
+      activeSubscribers = ?,
+      revenue = ?,
+      arpu = ?
+      WHERE month = ?
+  `,
+    [
+      month,
+      newSubscriptions,
+      cancellations,
+      activeSubscribers,
+      revenue,
+      arpu,
+      month,
+    ]
+  );
+}

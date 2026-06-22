@@ -10,7 +10,11 @@ export function validateSubscription(
   next: NextFunction
 ) {
   const subscription = req.body as SubscriptionRow | undefined;
-  const newSubscriptionError = invalidSubscriptionError(subscription);
+  const subscriptionMonth = req.params.month as string | undefined;
+  const newSubscriptionError = invalidSubscriptionError(
+    subscription,
+    subscriptionMonth,
+  );
   if (newSubscriptionError !== "")
     return next(new AppError(newSubscriptionError, 400));
   next();

@@ -5,8 +5,11 @@ export function isValidMonth(month: string) {
   return /^\d{4}-\d{2}$/.test(month);
 }
 
-// check if the given subscription is invalid, return error message 
-export function invalidSubscriptionError(subscription: SubscriptionRow | undefined): string {
+// check if the given subscription is invalid, return error message
+export function invalidSubscriptionError(
+  subscription: SubscriptionRow | undefined,
+  subscriptionMonth: string | undefined
+): string {
   if (!subscription) return "Request body missing";
 
   const missingFields: string[] = [];
@@ -23,7 +26,10 @@ export function invalidSubscriptionError(subscription: SubscriptionRow | undefin
 
   if (!subscription.revenue) {
     missingFields.push("revenue");
-  } else if (typeof subscription.revenue !== "number") {
+  } else if (
+    typeof subscription.revenue !== "number" ||
+    subscription.revenue < 0
+  ) {
     invalidFields.push("revenue");
   }
 
@@ -52,7 +58,7 @@ export function invalidSubscriptionError(subscription: SubscriptionRow | undefin
   }
 
   let errorMessage = "";
-  if (missingFields.length > 0) {
+  if (!subscriptionMonth && missingFields.length > 0) {
     errorMessage += "Missing required fields:";
     missingFields.forEach((field) => {
       errorMessage += ` ${field}`;

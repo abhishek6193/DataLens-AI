@@ -10,9 +10,11 @@ import {
   addSubscription,
   getCountSubscriptions,
   getSubscriptionsService,
+  modifySubscription,
 } from "../services/subscriptionsService";
-import { AppError } from "../utils/appError";
+
 import { validateSubscription } from "../middleware/validateSubscription";
+import { validateMonth } from "../middleware/validateMonth";
 
 const router = express.Router(); // express's router instance
 
@@ -81,6 +83,19 @@ router.post(
     const newSubscription = req.body;
     await addSubscription(newSubscription);
     res.status(201).json(successResponse(newSubscription));
+  })
+);
+
+router.put(
+  "/:month",
+  validateMonth,
+  jsonBodyParser(),
+  validateSubscription,
+  asyncHandler(async (req, res, next) => {
+    const subscriptionMonth = req.params.month as string;
+    const subscription = req.body;
+    await modifySubscription(subscription, subscriptionMonth);
+    res.status(200).json(successResponse(subscription));
   })
 );
 

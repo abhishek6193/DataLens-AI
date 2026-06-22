@@ -5,6 +5,7 @@ import {
   getSubscriptionsCount,
   getSubscriptionsPaginated,
   getSubscriptionsSorted,
+  updateSubscription,
 } from "../repositories/subscriptionRepository";
 import { SubscriptionRow, SubscriptionsApiOptions } from "../types";
 import { AppError } from "../utils/appError";
@@ -127,7 +128,29 @@ export async function addSubscription(newSubscription: SubscriptionRow) {
     newSubscription.month
   );
 
-  if (!existingSubscription || existingSubscription.length > 0)
+  if (existingSubscription && existingSubscription.length > 0)
     throw new AppError("month already exists", 409);
   return await createSubscription(newSubscription);
+}
+
+//service to update an existing susbscription
+export async function modifySubscription(
+  subscription: SubscriptionRow,
+  subscriptionMonth: string
+) {
+  const existingSubscription = await getSubscriptionsByMonthService(
+    subscriptionMonth
+  );
+
+  if (!existingSubscription || existingSubscription.length === 0)
+    throw new AppError("provided subscription doesn't exist", 404);
+
+  const existingSubscriptionObj = existingSubscription[0] as SubscriptionRow;
+
+  Object.assign(existingSubscriptionObj, {
+    ...subscription,
+    month: subscriptionMonth,
+  });
+
+  return await updateSubscription(existingSubscriptionObj);
 }
