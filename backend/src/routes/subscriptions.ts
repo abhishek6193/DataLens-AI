@@ -11,6 +11,7 @@ import {
   getCountSubscriptions,
   getSubscriptionsService,
   modifySubscription,
+  removeSubscription,
 } from "../services/subscriptionsService";
 
 import { validateSubscription } from "../middleware/validateSubscription";
@@ -94,8 +95,18 @@ router.put(
   asyncHandler(async (req, res, next) => {
     const subscriptionMonth = req.params.month as string;
     const subscription = req.body;
-    await modifySubscription(subscription, subscriptionMonth);
-    res.status(200).json(successResponse(subscription));
+    const result = await modifySubscription(subscription, subscriptionMonth);
+    res.status(200).json(successResponse(result));
+  })
+);
+
+router.delete(
+  "/:month",
+  validateMonth,
+  asyncHandler(async (req, res, next) => {
+    const subscriptionMonth = req.params.month as string;
+    const result = await removeSubscription(subscriptionMonth);
+    res.status(200).json(successResponse(result));
   })
 );
 

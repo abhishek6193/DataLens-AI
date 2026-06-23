@@ -119,7 +119,7 @@ export async function createSubscription(newSubscription: SubscriptionRow) {
   );
 }
 
-//update existing subscriptions in database
+//update existing subscription in database
 export async function updateSubscription(subscription: SubscriptionRow) {
   const {
     month,
@@ -150,4 +150,9 @@ export async function updateSubscription(subscription: SubscriptionRow) {
       month,
     ]
   );
+}
+
+//delete existing subscription in database
+export async function deleteSubscription(month: string) {
+  return run(`DELETE FROM subscriptions WHERE month = ?`, [month]);
 }

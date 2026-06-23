@@ -1,5 +1,6 @@
 import {
   createSubscription,
+  deleteSubscription,
   getSubscriptions,
   getSubscriptionsByMonth,
   getSubscriptionsCount,
@@ -153,4 +154,14 @@ export async function modifySubscription(
   });
 
   return await updateSubscription(existingSubscriptionObj);
+}
+
+//service to delete an existing subscription
+export async function removeSubscription(month: string) {
+  const subscriptionToRemove = await getSubscriptionsByMonthService(month);
+
+  if (!subscriptionToRemove || subscriptionToRemove.length === 0)
+    throw new AppError("provided subscription doesn't exist", 404);
+
+  return await deleteSubscription(month);
 }
